@@ -1,0 +1,6 @@
+vendor/
+.ddev/
+runtime/
+web/assets/
+assets/
+.env
