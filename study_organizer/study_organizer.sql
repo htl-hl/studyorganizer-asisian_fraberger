@@ -6,6 +6,7 @@ CREATE TABLE Users (
                        U_ID int PRIMARY KEY AUTO_INCREMENT,
                        U_username varchar(255) NOT NULL UNIQUE,
                        U_password varchar(255) NOT NULL,
+                       U_auth_key varchar(255) NOT NULL,
                        U_role varchar(255) NOT NULL
 );
 
