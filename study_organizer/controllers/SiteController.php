@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Homework;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -61,7 +62,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        // Alle Homework aus der Datenbank holen
+        $homeworks = Homework::find()->all();
+
+        // an View übergeben
+        return $this->render('index', [
+            'homeworks' => $homeworks,
+        ]);
     }
 
     /**
