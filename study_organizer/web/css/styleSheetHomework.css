@@ -1,0 +1,145 @@
+/* homework.css */
+
+/* Body-Hintergrund */
+body {
+    background-color: #f5f7fb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Cards generelle Styles */
+.hw-card {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Colored bar at the top of cards */
+.hw-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #0d6efd, #6610f2);
+    z-index: 1;
+}
+
+.hw-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    background-color: #f0f2f5; /* leichtes Grau beim Hover */
+    transition: all 0.3s ease;
+}
+
+/* Card Body */
+.hw-card .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+}
+
+/* Card Title */
+.hw-card .card-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #212529;
+}
+
+/* Card Description */
+.hw-card .card-text {
+    color: #6c757d;
+    flex-grow: 1;
+}
+
+/* Optional: Card Title und Text leicht dunkler beim Hover */
+.hw-card:hover .card-title {
+    color: #0d6efd;
+}
+
+.hw-card:hover .card-text,
+.hw-card:hover .text-muted {
+    color: #495057;
+}
+
+/* Badges and Subject Badges */
+.hw-card .badge, .badge-subject {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.hw-card .badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Buttons */
+.hw-card .btn-group .btn {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.hw-card .btn-group .btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Icon Shapes (links zu Stats oder Icons in Card) */
+.icon-shape {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.icon-shape:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Stat-Cards */
+.stat-card {
+    border-radius: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.2);
+}
+
+/* Rundungen für große Buttons */
+.btn-round {
+    border-radius: 25px;
+}
+
+/* Hover-Effekt für gesamte Card */
+.hw-card:hover .card-title {
+    color: #0d6efd;
+}
+
+.hw-card:hover .text-muted {
+    color: #495057;
+}
+
+/* Optional: sanfte Animation für alle Cards beim Laden */
+@keyframes cardFadeIn {
+    0% {opacity: 0; transform: translateY(20px);}
+    100% {opacity: 1; transform: translateY(0);}
+}
+
+.hw-card {
+    animation: cardFadeIn 0.5s ease forwards;
+}

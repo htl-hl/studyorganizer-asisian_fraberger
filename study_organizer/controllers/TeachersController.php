@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\Teachers;
 use app\models\TeachersSearch;
 use yii\web\Controller;
@@ -39,11 +40,13 @@ class TeachersController extends Controller
     public function actionIndex()
     {
         $searchModel = new TeachersSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $teachers = Teachers::find()->all(); // alle Lehrer holen
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'teachers' => $teachers // alle Lehrer'
         ]);
     }
 
@@ -111,8 +114,16 @@ class TeachersController extends Controller
      */
     public function actionDelete($T_ID)
     {
+        // Prüfen, ob der Lehrer noch Fächer hat
+        if (\app\models\Subjects::find()->where(['S_T_ID' => $T_ID])->exists()) {
+            Yii::$app->session->setFlash('error', 'Dieser Lehrer hat noch Fächer. Lösche zuerst die Fächer.');
+            return $this->redirect(['index']);
+        }
+
+        // Lehrer löschen
         $this->findModel($T_ID)->delete();
 
+        Yii::$app->session->setFlash('success', 'Lehrer erfolgreich gelöscht.');
         return $this->redirect(['index']);
     }
 

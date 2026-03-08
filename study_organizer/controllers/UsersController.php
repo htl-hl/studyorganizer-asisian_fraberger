@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\Users;
 use app\models\UsersSearch;
 use yii\web\Controller;
@@ -39,7 +40,7 @@ class UsersController extends Controller
     public function actionIndex()
     {
         $searchModel = new UsersSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
