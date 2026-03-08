@@ -14,7 +14,7 @@ use Yii;
  * @property int $H_is_done
  * @property int $H_S_ID
  *
- * @property Subject $hS
+ * @property Subjects $hS
  */
 class Homework extends \yii\db\ActiveRecord
 {
@@ -41,7 +41,7 @@ class Homework extends \yii\db\ActiveRecord
             [['H_due_date'], 'safe'],
             [['H_is_done', 'H_S_ID'], 'integer'],
             [['H_title'], 'string', 'max' => 255],
-            [['H_S_ID'], 'exist', 'skipOnError' => true, 'targetClass' => Subject::class, 'targetAttribute' => ['H_S_ID' => 'S_ID']],
+            [['H_S_ID'], 'exist', 'skipOnError' => true, 'targetClass' => Subjects::class, 'targetAttribute' => ['H_S_ID' => 'S_ID']],
         ];
     }
 

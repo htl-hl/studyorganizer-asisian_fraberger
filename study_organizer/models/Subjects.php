@@ -36,7 +36,7 @@ class Subjects extends \yii\db\ActiveRecord
             [['S_T_ID'], 'integer'],
             [['S_name'], 'string', 'max' => 255],
             [['S_name'], 'unique'],
-            [['S_T_ID'], 'exist', 'skipOnError' => true, 'targetClass' => Teacher::class, 'targetAttribute' => ['S_T_ID' => 'T_ID']],
+            [['S_T_ID'], 'exist', 'skipOnError' => true, 'targetClass' => Teachers::class, 'targetAttribute' => ['S_T_ID' => 'T_ID']],
         ];
     }
 
@@ -79,6 +79,12 @@ class Subjects extends \yii\db\ActiveRecord
     public static function find()
     {
         return new SubjectsQuery(get_called_class());
+    }
+
+    // Subjects.php
+    public function getTeacher()
+    {
+        return $this->hasOne(Teachers::class, ['T_ID' => 'S_T_ID']);
     }
 
 }

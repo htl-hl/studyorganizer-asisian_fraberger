@@ -1,0 +1,55 @@
+body {
+    background-color: #f5f7fb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hw-card {
+    background-color: #fff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hw-card::before {
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:4px;
+    background: linear-gradient(90deg,#0d6efd,#6610f2);
+    z-index:1;
+}
+
+.hw-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.15);
+    background-color: #f8f9fa; /* leicht grau beim hover */
+}
+
+.hw-card .card-body {
+    display:flex;
+    flex-direction: column;
+    padding:1.25rem;
+}
+
+.hw-card .card-title {
+    font-weight:600;
+    font-size:1.2rem;
+}
+
+.hw-card .card-text {
+    color: #6c757d;
+    flex-grow:1;
+}
+
+.btn-round {
+    border-radius: 25px;
+}
+
+.btn-outline-secondary:hover, .btn-outline-danger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}

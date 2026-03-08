@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\Subjects;
 use app\models\SubjectsSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -39,11 +41,13 @@ class SubjectsController extends Controller
     public function actionIndex()
     {
         $searchModel = new SubjectsSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $subjects = Subjects::find()->with('teacher')->all(); // alle Fächer + Lehrer
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'subjects' => $subjects // alle Fächer + Lehrer'
         ]);
     }
 
@@ -69,12 +73,8 @@ class SubjectsController extends Controller
     {
         $model = new Subjects();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'S_ID' => $model->S_ID]);
-            }
-        } else {
-            $model->loadDefaultValues();
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [

@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\Homework;
+use app\models\Subjects;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -62,7 +64,29 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        if (Yii::$app->user->isGuest) {
+            $homework = Homework::find()->limit(6)->all();
+        } else {
+            /** @var \app\models\Users $user */
+            $user = Yii::$app->user->identity;
+
+            if ($user->U_role === 'admin') {
+                $homework = Homework::find()->all();
+            } else {
+                $homework = Homework::find()
+                    ->where(['H_S_ID' => $user->U_ID])
+                    ->all();
+            }
+        }
+
+        return $this->render('index', [
+            'homework' => $homework
+        ]);
+    }
+
+    public function getSubject()
+    {
+        return $this->hasOne(Subjects::class, ['id' => 'subject_id']);
     }
 
     /**

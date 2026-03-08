@@ -1,6 +1,7 @@
 <?php
 
 /** @var yii\web\View $this */
+
 /** @var string $content */
 
 use app\assets\AppAsset;
@@ -22,6 +23,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
     <title><?= Html::encode($this->title) ?></title>
@@ -31,6 +33,16 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php $this->beginBody() ?>
 
 <header id="header">
+
+    <meta charset="<?= Yii::$app->charset ?>">
+    <title><?= Html::encode($this->title) ?></title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <?php $this->head() ?>
+    <i class="bi bi-trash"></i>
+    <i class="bi bi-pencil"></i>
+    <i class="bi bi-plus"></i>
     <?php
     NavBar::begin([
             'brandLabel' => '<i class="bi bi-journals"></i> ' . Html::encode(Yii::$app->name),
@@ -38,23 +50,27 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
     echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            'options' => ['class' => 'navbar-nav'],
+            'items' => [
+                    ['label' => 'Home', 'url' => ['/site/index']],
+                    ['label' => 'Homework', 'url' => ['/homework/index']],
+                    ['label' => 'User', 'url' => ['/users/index']],
+                    ['label' => 'Teacher', 'url' => ['/teachers/index']],
+                    ['label' => 'Subject', 'url' => ['subjects/index']],
+                    ['label' => 'About', 'url' => ['/site/about']],
+                    ['label' => 'Contact', 'url' => ['/site/contact']],
 
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
+                    Yii::$app->user->isGuest
+                            ? ['label' => 'Login', 'url' => ['/site/login']]
+                            : '<li class="nav-item">'
+                            . Html::beginForm(['/site/logout'])
+                            . Html::submitButton(
+                                    'Logout (' . Yii::$app->user->identity->username . ')',
+                                    ['class' => 'nav-link btn btn-link logout']
+                            )
+                            . Html::endForm()
+                            . '</li>'
+            ]
     ]);
     NavBar::end();
     ?>
