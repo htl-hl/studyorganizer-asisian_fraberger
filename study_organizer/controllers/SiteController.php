@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\Homework;
-use app\models\Subjects;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -11,7 +10,6 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-use app\models\SignupForm;
 
 class SiteController extends Controller
 {
@@ -64,29 +62,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest) {
-            $homework = Homework::find()->limit(6)->all();
-        } else {
-            /** @var \app\models\Users $user */
-            $user = Yii::$app->user->identity;
+        // Alle Homework aus der Datenbank holen
+        $homeworks = Homework::find()->all();
 
-            if ($user->U_role === 'admin') {
-                $homework = Homework::find()->all();
-            } else {
-                $homework = Homework::find()
-                    ->where(['H_S_ID' => $user->U_ID])
-                    ->all();
-            }
-        }
-
+        // an View übergeben
         return $this->render('index', [
-            'homework' => $homework
+            'homeworks' => $homeworks,
         ]);
-    }
-
-    public function getSubject()
-    {
-        return $this->hasOne(Subjects::class, ['id' => 'subject_id']);
     }
 
     /**
@@ -107,32 +89,6 @@ class SiteController extends Controller
 
         $model->password = '';
         return $this->render('login', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Register action.
-     *
-     * @return Response|string
-     */
-    public function actionRegister()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $user = $model->signup();
-            if ($user) {
-                Yii::$app->user->login($user);
-                return $this->goHome();
-            }
-        }
-
-        $model->password = '';
-        return $this->render('register', [
             'model' => $model,
         ]);
     }

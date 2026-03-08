@@ -1,54 +1,111 @@
 <?php
-
 /** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
+/** @var app\models\Homework[] $homeworks */
 
-/** @var app\models\LoginForm $model */
-
-use yii\bootstrap5\ActiveForm;
-use yii\bootstrap5\Html;
-
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Dashboard';
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill out the following fields to login:</p>
+<div class="container mt-4">
 
-    <div class="row">
-        <div class="col-lg-5">
+    <!-- Titel -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5">📊 StudyOrganizer Dashboard</h1>
+            <p class="text-muted">Übersicht deiner Hausübungen</p>
+        </div>
+    </div>
 
-            <?php $form = ActiveForm::begin([
-                    'id' => 'login-form',
-                    'fieldConfig' => [
-                            'template' => "{label}\n{input}\n{error}",
-                            'labelOptions' => ['class' => 'col-lg-1 col-form-label mr-lg-3'],
-                            'inputOptions' => ['class' => 'col-lg-3 form-control'],
-                            'errorOptions' => ['class' => 'col-lg-7 invalid-feedback'],
-                    ],
-            ]); ?>
+    <!-- Karten Übersicht -->
+    <div class="row mb-4">
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-
-            <?= $form->field($model, 'password')->passwordInput() ?>
-
-            <?= $form->field($model, 'rememberMe')->checkbox([
-                    'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            ]) ?>
-
-            <div class="form-group">
-                <div>
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+        <!-- Homework Card -->
+        <div class="col-md-4">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <h5 class="card-title">📚 Homework</h5>
+                    <p class="card-text fs-4">
+                        <?= count($homeworks) ?> Einträge
+                    </p>
+                    <a href="index.php?r=homework/index" class="btn btn-light btn-sm">
+                        Anzeigen
+                    </a>
                 </div>
             </div>
+        </div>
 
-            <?php ActiveForm::end(); ?>
-
-            <div class="mt-3">
-                No account yet? <?= Html::a('Register here', ['site/register']) ?>.
+        <!-- Neue Homework -->
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <h5 class="card-title">➕ Neue Homework</h5>
+                    <p class="card-text">
+                        Neue Hausübung hinzufügen
+                    </p>
+                    <a href="index.php?r=homework/create" class="btn btn-light btn-sm">
+                        Erstellen
+                    </a>
+                </div>
             </div>
+        </div>
+
+    </div>
+
+    <!-- Tabelle -->
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            📋 Letzte Homework
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover">
+
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titel</th>
+                    <th>Aktionen</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <?php foreach ($homeworks as $hw): ?>
+                    <tr>
+                        <td><?= $hw->id ?></td>
+
+                        <td>
+                            <strong><?= $hw->title ?></strong>
+                        </td>
+
+                        <td>
+
+                            <a href="index.php?r=homework/view&id=<?= $hw->id ?>"
+                               class="btn btn-sm btn-primary">
+                                👁 View
+                            </a>
+
+                            <a href="index.php?r=homework/update&id=<?= $hw->id ?>"
+                               class="btn btn-sm btn-warning">
+                                ✏ Edit
+                            </a>
+
+                            <a href="index.php?r=homework/delete&id=<?= $hw->id ?>"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Wirklich löschen?')">
+                                🗑 Delete
+                            </a>
+
+                        </td>
+
+                    </tr>
+                <?php endforeach; ?>
+
+                </tbody>
+
+            </table>
 
         </div>
     </div>
+
 </div>
