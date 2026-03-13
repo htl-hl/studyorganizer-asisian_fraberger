@@ -1,0 +1,34 @@
+DROP DATABASE IF EXISTS STUDY_ORGANIZER;
+CREATE DATABASE STUDY_ORGANIZER;
+USE STUDY_ORGANIZER;
+
+CREATE TABLE Users (
+                       U_ID int PRIMARY KEY AUTO_INCREMENT,
+                       U_username varchar(255) NOT NULL UNIQUE,
+                       U_password varchar(255) NOT NULL,
+                       U_auth_key varchar(255) NOT NULL,
+                       U_role varchar(255) NOT NULL
+);
+
+CREATE TABLE Teachers (
+                          T_ID INT PRIMARY KEY AUTO_INCREMENT,
+                          T_name VARCHAR(255) NOT NULL,
+                          T_is_active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE Subjects (
+                          S_ID INT PRIMARY KEY AUTO_INCREMENT,
+                          S_name VARCHAR(255) NOT NULL UNIQUE,
+                          S_T_ID INT NOT NULL,
+                          FOREIGN KEY (S_T_ID) REFERENCES Teachers(T_ID)
+);
+
+CREATE TABLE Homework (
+                          H_ID INT PRIMARY KEY AUTO_INCREMENT,
+                          H_title VARCHAR(255) NOT NULL,
+                          H_description TEXT,
+                          H_due_date DATE NOT NULL,
+                          H_is_done BOOLEAN NOT NULL DEFAULT FALSE,
+                          H_S_ID INT NOT NULL,
+                          FOREIGN KEY (H_S_ID) REFERENCES Subjects(S_ID)
+);
