@@ -30,9 +30,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'T_ID',
             'T_name',
-            'T_is_active',
+            [
+                'attribute' => 'T_is_active',
+                'label' => 'Status',
+                'format' => 'raw',
+                'filter' => ['1' => 'Active', '0' => 'Inactive'],
+                'value' => static function (Teachers $model) {
+                    if ((int) $model->T_is_active === 1) {
+                        return '<span class="badge text-bg-success">Active</span>';
+                    }
+
+                    return '<span class="badge text-bg-secondary">Inactive</span>';
+                },
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Teachers $model, $key, $index, $column) {

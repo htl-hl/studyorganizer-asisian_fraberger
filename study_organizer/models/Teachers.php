@@ -44,20 +44,20 @@ class Teachers extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'T_ID' => Yii::t('app', 'T ID'),
-            'T_name' => Yii::t('app', 'T Name'),
-            'T_is_active' => Yii::t('app', 'T Is Active'),
+            'T_ID' => Yii::t('app', 'ID'),
+            'T_name' => Yii::t('app', 'Name'),
+            'T_is_active' => Yii::t('app', 'Active'),
         ];
     }
 
     /**
      * Gets query for [[Subjects]].
      *
-     * @return \yii\db\ActiveQuery|SubjectQuery
+     * @return \yii\db\ActiveQuery|SubjectsQuery
      */
     public function getSubjects()
     {
-        return $this->hasMany(Subject::class, ['S_T_ID' => 'T_ID']);
+        return $this->hasMany(Subjects::class, ['S_T_ID' => 'T_ID']);
     }
 
     /**

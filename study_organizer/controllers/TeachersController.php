@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Teachers;
 use app\models\TeachersSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,8 +23,17 @@ class TeachersController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'roles' => ['@'],
+                        ],
+                    ],
+                ],
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -41,12 +51,11 @@ class TeachersController extends Controller
     {
         $searchModel = new TeachersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $teachers = Teachers::find()->all(); // alle Lehrer holen
+        $dataProvider->query->orderBy(['T_name' => SORT_ASC]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'teachers' => $teachers // alle Lehrer'
         ]);
     }
 
@@ -74,6 +83,8 @@ class TeachersController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
+                Yii::$app->session->setFlash('success', 'Teacher created successfully.');
+
                 return $this->redirect(['view', 'T_ID' => $model->T_ID]);
             }
         } else {
@@ -97,6 +108,8 @@ class TeachersController extends Controller
         $model = $this->findModel($T_ID);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Teacher updated successfully.');
+
             return $this->redirect(['view', 'T_ID' => $model->T_ID]);
         }
 
@@ -114,16 +127,14 @@ class TeachersController extends Controller
      */
     public function actionDelete($T_ID)
     {
-        // Prüfen, ob der Lehrer noch Fächer hat
         if (\app\models\Subjects::find()->where(['S_T_ID' => $T_ID])->exists()) {
-            Yii::$app->session->setFlash('error', 'Dieser Lehrer hat noch Fächer. Lösche zuerst die Fächer.');
+            Yii::$app->session->setFlash('error', 'This teacher is still assigned to one or more subjects.');
             return $this->redirect(['index']);
         }
 
-        // Lehrer löschen
         $this->findModel($T_ID)->delete();
 
-        Yii::$app->session->setFlash('success', 'Lehrer erfolgreich gelöscht.');
+        Yii::$app->session->setFlash('success', 'Teacher deleted successfully.');
         return $this->redirect(['index']);
     }
 

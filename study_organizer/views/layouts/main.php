@@ -1,7 +1,6 @@
 <?php
 
 /** @var yii\web\View $this */
-
 /** @var string $content */
 
 use app\assets\AppAsset;
@@ -15,83 +14,93 @@ AppAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
-$this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
+$this->registerMetaTag([
+    'name' => 'viewport',
+    'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no',
+]);
 $this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
-$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
+$this->registerLinkTag([
+    'rel' => 'icon',
+    'type' => 'image/x-icon',
+    'href' => Yii::getAlias('@web/favicon.ico'),
+]);
+
+$isGuest = Yii::$app->user->isGuest;
+$isAdmin = !$isGuest && Yii::$app->user->identity->U_role === 'admin';
+
+$navItems = [
+    ['label' => 'Dashboard', 'url' => ['/site/index']],
+];
+
+if (!$isGuest) {
+    $navItems[] = ['label' => 'Homework', 'url' => ['/homework/index']];
+    $navItems[] = ['label' => 'Subjects', 'url' => ['/subjects/index']];
+    $navItems[] = ['label' => 'Teachers', 'url' => ['/teachers/index']];
+
+    if ($isAdmin) {
+        $navItems[] = ['label' => 'Users', 'url' => ['/users/index']];
+    }
+}
+
+$navItems[] = ['label' => 'About', 'url' => ['/site/about']];
+$navItems[] = ['label' => 'Contact', 'url' => ['/site/contact']];
+
+if ($isGuest) {
+    $navItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+    $navItems[] = ['label' => 'Register', 'url' => ['/site/register']];
+} else {
+    $navItems[] = '<li class="nav-item">'
+        . Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
+        . Html::submitButton(
+            'Logout (' . Yii::$app->user->identity->getUsername() . ')',
+            ['class' => 'nav-link btn btn-link text-decoration-none']
+        )
+        . Html::endForm()
+        . '</li>';
+}
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
-    <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
-</head>
-<body class="d-flex flex-column h-100">
-<?php $this->beginBody() ?>
-
-<header id="header">
-
     <meta charset="<?= Yii::$app->charset ?>">
     <title><?= Html::encode($this->title) ?></title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
     <?php $this->head() ?>
-    <i class="bi bi-trash"></i>
-    <i class="bi bi-pencil"></i>
-    <i class="bi bi-plus"></i>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+<?php $this->beginBody() ?>
+
+<header>
     <?php
     NavBar::begin([
-            'brandLabel' => '<i class="bi bi-journals"></i> ' . Html::encode(Yii::$app->name),
-            'brandUrl' => Yii::$app->homeUrl,
-            'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+        'brandLabel' => Yii::$app->name,
+        'brandUrl' => Yii::$app->homeUrl,
+        'options' => ['class' => 'navbar navbar-expand-lg navbar-dark bg-dark shadow-sm'],
     ]);
     echo Nav::widget([
-            'options' => ['class' => 'navbar-nav'],
-            'items' => [
-                    ['label' => 'Home', 'url' => ['/site/index']],
-                    ['label' => 'Homework', 'url' => ['/homework/index']],
-                    ['label' => 'User', 'url' => ['/users/index']],
-                    ['label' => 'Teacher', 'url' => ['/teachers/index']],
-                    ['label' => 'Subject', 'url' => ['subjects/index']],
-                    ['label' => 'About', 'url' => ['/site/about']],
-                    ['label' => 'Contact', 'url' => ['/site/contact']],
-
-                    Yii::$app->user->isGuest
-                            ? ['label' => 'Login', 'url' => ['/site/login']]
-                            : '<li class="nav-item">'
-                            . Html::beginForm(['/site/logout'])
-                            . Html::submitButton(
-                                    'Logout (' . Yii::$app->user->identity->username . ')',
-                                    ['class' => 'nav-link btn btn-link logout']
-                            )
-                            . Html::endForm()
-                            . '</li>'
-            ]
+        'options' => ['class' => 'navbar-nav ms-auto align-items-lg-center'],
+        'items' => $navItems,
     ]);
     NavBar::end();
     ?>
 </header>
 
-<main id="main" class="flex-shrink-0" role="main">
+<main class="flex-shrink-0 py-4">
     <div class="container">
         <?php if (!empty($this->params['breadcrumbs'])): ?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
+        <?php endif; ?>
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>
 </main>
 
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; StudyOrganizer <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end">Powered by StudyOrganizer</div>
-        </div>
+<footer class="mt-auto border-top bg-white py-3">
+    <div class="container d-flex flex-column flex-md-row justify-content-between text-muted small gap-2">
+        <span>&copy; StudyOrganizer <?= date('Y') ?></span>
+        <span>Built with Yii2</span>
     </div>
 </footer>
 

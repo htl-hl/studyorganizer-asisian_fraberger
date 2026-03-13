@@ -51,23 +51,28 @@ class Homework extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'H_ID' => Yii::t('app', 'H ID'),
-            'H_title' => Yii::t('app', 'H Title'),
-            'H_description' => Yii::t('app', 'H Description'),
-            'H_due_date' => Yii::t('app', 'H Due Date'),
-            'H_is_done' => Yii::t('app', 'H Is Done'),
-            'H_S_ID' => Yii::t('app', 'H S ID'),
+            'H_ID' => Yii::t('app', 'ID'),
+            'H_title' => Yii::t('app', 'Title'),
+            'H_description' => Yii::t('app', 'Description'),
+            'H_due_date' => Yii::t('app', 'Due date'),
+            'H_is_done' => Yii::t('app', 'Completed'),
+            'H_S_ID' => Yii::t('app', 'Subject'),
         ];
     }
 
     /**
      * Gets query for [[HS]].
      *
-     * @return \yii\db\ActiveQuery|SubjectQuery
+     * @return \yii\db\ActiveQuery|SubjectsQuery
      */
     public function getHS()
     {
-        return $this->hasOne(Subject::class, ['S_ID' => 'H_S_ID']);
+        return $this->getSubject();
+    }
+
+    public function getSubject()
+    {
+        return $this->hasOne(Subjects::class, ['S_ID' => 'H_S_ID']);
     }
 
     /**

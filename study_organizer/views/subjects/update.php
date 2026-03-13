@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\Subjects $model */
 
-$this->title = Yii::t('app', 'Update Subjects: {name}', [
-    'name' => $model->S_ID,
+$this->title = Yii::t('app', 'Update Subject: {name}', [
+    'name' => $model->S_name,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Subjects'), 'url' => ['subjects/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->S_ID, 'url' => ['view', 'S_ID' => $model->S_ID]];

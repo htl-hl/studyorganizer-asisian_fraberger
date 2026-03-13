@@ -32,9 +32,12 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['U_username'], 'trim'],
+            [['U_role'], 'default', 'value' => 'user'],
             [['U_username', 'U_password', 'U_role'], 'required'],
             [['U_username', 'U_password', 'U_role'], 'string', 'max' => 255],
             [['U_username'], 'unique'],
+            [['U_role'], 'in', 'range' => ['admin', 'user']],
         ];
     }
 
@@ -44,10 +47,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'U_ID' => Yii::t('app', 'U ID'),
-            'U_username' => Yii::t('app', 'U Username'),
-            'U_password' => Yii::t('app', 'U Password'),
-            'U_role' => Yii::t('app', 'U Role'),
+            'U_ID' => Yii::t('app', 'ID'),
+            'U_username' => Yii::t('app', 'Username'),
+            'U_password' => Yii::t('app', 'Password'),
+            'U_role' => Yii::t('app', 'Role'),
         ];
     }
 

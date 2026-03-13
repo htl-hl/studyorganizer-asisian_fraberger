@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\Teachers $model */
 
-$this->title = $model->T_ID;
+$this->title = $model->T_name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Teachers'), 'url' => ['teachers/index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -31,7 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'T_ID',
             'T_name',
-            'T_is_active',
+            [
+                'label' => 'Status',
+                'format' => 'raw',
+                'value' => (int) $model->T_is_active === 1
+                    ? '<span class="badge text-bg-success">Active</span>'
+                    : '<span class="badge text-bg-secondary">Inactive</span>',
+            ],
         ],
     ]) ?>
 

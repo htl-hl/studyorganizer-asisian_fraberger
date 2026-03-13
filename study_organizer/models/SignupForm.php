@@ -13,8 +13,10 @@ class SignupForm extends Model
     public function rules()
     {
         return [
+            [['username'], 'trim'],
             [['username', 'password'], 'required'],
-            [['username', 'password'], 'string', 'max' => 255],
+            [['username'], 'string', 'min' => 3, 'max' => 255],
+            [['password'], 'string', 'min' => 6, 'max' => 255],
             ['username', 'unique', 'targetClass' => Users::class, 'targetAttribute' => 'U_username'],
         ];
     }

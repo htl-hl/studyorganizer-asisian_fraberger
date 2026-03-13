@@ -1,7 +1,9 @@
 <?php
 
 use app\models\Subjects;
+use app\models\Teachers;
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -12,6 +14,11 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Subjects');
 $this->params['breadcrumbs'][] = $this->title;
+$teacherFilter = ArrayHelper::map(
+    Teachers::find()->orderBy(['T_name' => SORT_ASC])->all(),
+    'T_ID',
+    'T_name'
+);
 ?>
 <div class="subjects-index">
 
@@ -30,9 +37,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'S_ID',
             'S_name',
-            'S_T_ID',
+            [
+                'attribute' => 'S_T_ID',
+                'label' => 'Teacher',
+                'filter' => $teacherFilter,
+                'value' => static function (Subjects $model) {
+                    return $model->teacher ? $model->teacher->T_name : 'No teacher';
+                },
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Subjects $model, $key, $index, $column) {
