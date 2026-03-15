@@ -12,13 +12,20 @@ use yii\widgets\ActiveForm;
 
 <div class="subjects-form">
     <?php
+    $teacherQuery = Teachers::find()->orderBy(['T_name' => SORT_ASC]);
+
+    if ($model->isNewRecord) {
+        $teacherQuery->where(['T_is_active' => 1]);
+    } else {
+        $teacherQuery->andWhere(['or', ['T_is_active' => 1], ['T_ID' => $model->S_T_ID]]);
+    }
+
     $teachers = ArrayHelper::map(
-        Teachers::find()
-            ->where(['T_is_active' => 1])
-            ->orderBy(['T_name' => SORT_ASC])
-            ->all(),
+        $teacherQuery->all(),
         'T_ID',
-        'T_name'
+        static function (Teachers $teacher) {
+            return $teacher->T_name . ((int) $teacher->T_is_active === 1 ? '' : ' (inactive)');
+        }
     );
     $hasTeachers = !empty($teachers);
     ?>
@@ -42,10 +49,11 @@ use yii\widgets\ActiveForm;
         ]
     ) ?>
 
+    <p class="form-note">Inactive teachers stay assigned to old subjects, but new subjects should usually use active teachers.</p>
+
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success', 'disabled' => !$hasTeachers]) ?>
+        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-primary', 'disabled' => !$hasTeachers]) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>

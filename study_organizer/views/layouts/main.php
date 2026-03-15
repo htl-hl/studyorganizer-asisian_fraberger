@@ -27,18 +27,18 @@ $this->registerLinkTag([
 ]);
 
 $isGuest = Yii::$app->user->isGuest;
-$isAdmin = !$isGuest && Yii::$app->user->identity->U_role === 'admin';
+$isAdmin = !$isGuest && Yii::$app->user->identity->isAdmin();
 
 $navItems = [
-    ['label' => 'Dashboard', 'url' => ['/site/index']],
+    ['label' => 'Home', 'url' => ['/site/index']],
 ];
 
 if (!$isGuest) {
     $navItems[] = ['label' => 'Homework', 'url' => ['/homework/index']];
-    $navItems[] = ['label' => 'Subjects', 'url' => ['/subjects/index']];
-    $navItems[] = ['label' => 'Teachers', 'url' => ['/teachers/index']];
 
     if ($isAdmin) {
+        $navItems[] = ['label' => 'Subjects', 'url' => ['/subjects/index']];
+        $navItems[] = ['label' => 'Teachers', 'url' => ['/teachers/index']];
         $navItems[] = ['label' => 'Users', 'url' => ['/users/index']];
     }
 }
@@ -54,7 +54,7 @@ if ($isGuest) {
         . Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
         . Html::submitButton(
             'Logout (' . Yii::$app->user->identity->getUsername() . ')',
-            ['class' => 'nav-link btn btn-link text-decoration-none']
+            ['class' => 'nav-link btn btn-link text-decoration-none logout']
         )
         . Html::endForm()
         . '</li>';
@@ -66,10 +66,9 @@ if ($isGuest) {
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <title><?= Html::encode($this->title) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <?php $this->head() ?>
 </head>
-<body class="d-flex flex-column min-vh-100 bg-light">
+<body class="d-flex flex-column min-vh-100">
 <?php $this->beginBody() ?>
 
 <header>
@@ -77,7 +76,7 @@ if ($isGuest) {
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar navbar-expand-lg navbar-dark bg-dark shadow-sm'],
+        'options' => ['class' => 'navbar navbar-expand-lg navbar-light bg-white border-bottom'],
     ]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav ms-auto align-items-lg-center'],
@@ -87,7 +86,7 @@ if ($isGuest) {
     ?>
 </header>
 
-<main class="flex-shrink-0 py-4">
+<main class="flex-shrink-0">
     <div class="container">
         <?php if (!empty($this->params['breadcrumbs'])): ?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
@@ -98,9 +97,9 @@ if ($isGuest) {
 </main>
 
 <footer class="mt-auto border-top bg-white py-3">
-    <div class="container d-flex flex-column flex-md-row justify-content-between text-muted small gap-2">
+    <div class="container d-flex flex-column flex-md-row justify-content-between small gap-2">
         <span>&copy; StudyOrganizer <?= date('Y') ?></span>
-        <span>Built with Yii2</span>
+        <span>Simple Yii2 school project</span>
     </div>
 </footer>
 

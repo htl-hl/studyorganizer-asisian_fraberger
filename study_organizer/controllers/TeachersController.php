@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Subjects;
 use app\models\Teachers;
 use app\models\TeachersSearch;
 use yii\filters\AccessControl;
@@ -29,6 +30,10 @@ class TeachersController extends Controller
                         [
                             'allow' => true,
                             'roles' => ['@'],
+                            'matchCallback' => static function () {
+                                return !Yii::$app->user->isGuest
+                                    && Yii::$app->user->identity->isAdmin();
+                            },
                         ],
                     ],
                 ],
@@ -51,7 +56,9 @@ class TeachersController extends Controller
     {
         $searchModel = new TeachersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->query->orderBy(['T_name' => SORT_ASC]);
+        $dataProvider->query
+            ->with('subjects')
+            ->orderBy(['T_name' => SORT_ASC]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -80,14 +87,44 @@ class TeachersController extends Controller
     public function actionCreate()
     {
         $model = new Teachers();
+        $model->scenario = 'create';
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                Yii::$app->session->setFlash('success', 'Teacher created successfully.');
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $transaction = Yii::$app->db->beginTransaction();
+
+            try {
+                $subject = new Subjects([
+                    'S_name' => $model->initialSubjectName,
+                ]);
+
+                if (!$model->save(false)) {
+                    throw new \RuntimeException('Teacher could not be saved.');
+                }
+
+                $subject->S_T_ID = $model->T_ID;
+
+                if (!$subject->save()) {
+                    foreach ($subject->getFirstErrors() as $message) {
+                        $model->addError('initialSubjectName', $message);
+                    }
+
+                    throw new \RuntimeException('Subject could not be saved.');
+                }
+
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', 'Teacher created successfully with the first subject.');
 
                 return $this->redirect(['view', 'T_ID' => $model->T_ID]);
+            } catch (\Throwable $exception) {
+                $transaction->rollBack();
+
+                if (!$model->hasErrors('initialSubjectName')) {
+                    $model->addError('initialSubjectName', 'The first subject could not be created.');
+                }
             }
-        } else {
+        }
+
+        if ($this->request->isGet) {
             $model->loadDefaultValues();
         }
 
@@ -127,15 +164,9 @@ class TeachersController extends Controller
      */
     public function actionDelete($T_ID)
     {
-        if (\app\models\Subjects::find()->where(['S_T_ID' => $T_ID])->exists()) {
-            Yii::$app->session->setFlash('error', 'This teacher is still assigned to one or more subjects.');
-            return $this->redirect(['index']);
-        }
+        Yii::$app->session->setFlash('error', 'Teachers cannot be deleted. Set the teacher to inactive instead.');
 
-        $this->findModel($T_ID)->delete();
-
-        Yii::$app->session->setFlash('success', 'Teacher deleted successfully.');
-        return $this->redirect(['index']);
+        return $this->redirect(['view', 'T_ID' => $T_ID]);
     }
 
     /**

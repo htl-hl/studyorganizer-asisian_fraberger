@@ -73,6 +73,7 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             $homeworks = Homework::find()
                 ->with('subject')
+                ->where(['H_U_ID' => Yii::$app->user->id])
                 ->orderBy([
                     'H_is_done' => SORT_ASC,
                     'H_due_date' => SORT_ASC,

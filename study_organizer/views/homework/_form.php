@@ -24,14 +24,18 @@ use yii\widgets\ActiveForm;
 
     <?php if (!$hasSubjects): ?>
         <div class="alert alert-warning">
-            Create a subject before adding homework.
-            <?= Html::a('Create subject', ['/subjects/create'], ['class' => 'alert-link']) ?>
+            <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->isAdmin()): ?>
+                Create a subject before adding homework.
+                <?= Html::a('Create subject', ['/subjects/create'], ['class' => 'alert-link']) ?>
+            <?php else: ?>
+                No subjects are available yet. Ask an admin to create at least one subject first.
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 
     <?= $form->field($model, 'H_title')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'H_description')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'H_description')->textarea(['rows' => 4]) ?>
 
     <?= $form->field($model, 'H_due_date')->input('date') ?>
 
@@ -43,12 +47,11 @@ use yii\widgets\ActiveForm;
         ]
     ) ?>
 
-    <?= $form->field($model, 'H_is_done')->checkbox() ?>
+    <p class="form-note">After saving, you can mark the homework as done. Done homework cannot be changed anymore.</p>
 
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success', 'disabled' => !$hasSubjects]) ?>
+        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-primary', 'disabled' => !$hasSubjects]) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>

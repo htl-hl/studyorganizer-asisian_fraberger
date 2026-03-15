@@ -30,6 +30,10 @@ class SubjectsController extends Controller
                         [
                             'allow' => true,
                             'roles' => ['@'],
+                            'matchCallback' => static function () {
+                                return !Yii::$app->user->isGuest
+                                    && Yii::$app->user->identity->isAdmin();
+                            },
                         ],
                     ],
                 ],
