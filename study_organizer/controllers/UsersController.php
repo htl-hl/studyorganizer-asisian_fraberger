@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Users;
 use app\models\UsersSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,8 +23,21 @@ class UsersController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'roles' => ['@'],
+                            'matchCallback' => static function () {
+                                return !Yii::$app->user->isGuest
+                                    && Yii::$app->user->identity->U_role === 'admin';
+                            },
+                        ],
+                    ],
+                ],
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -72,6 +86,8 @@ class UsersController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
+                Yii::$app->session->setFlash('success', 'User created successfully.');
+
                 return $this->redirect(['view', 'U_ID' => $model->U_ID]);
             }
         } else {
@@ -95,6 +111,8 @@ class UsersController extends Controller
         $model = $this->findModel($U_ID);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'User updated successfully.');
+
             return $this->redirect(['view', 'U_ID' => $model->U_ID]);
         }
 
@@ -112,7 +130,14 @@ class UsersController extends Controller
      */
     public function actionDelete($U_ID)
     {
+        if ((int) $U_ID === (int) Yii::$app->user->id) {
+            Yii::$app->session->setFlash('error', 'You cannot delete the account you are currently using.');
+
+            return $this->redirect(['view', 'U_ID' => $U_ID]);
+        }
+
         $this->findModel($U_ID)->delete();
+        Yii::$app->session->setFlash('success', 'User deleted successfully.');
 
         return $this->redirect(['index']);
     }

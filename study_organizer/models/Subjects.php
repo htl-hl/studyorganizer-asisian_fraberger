@@ -46,9 +46,9 @@ class Subjects extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'S_ID' => Yii::t('app', 'S ID'),
-            'S_name' => Yii::t('app', 'S Name'),
-            'S_T_ID' => Yii::t('app', 'S T ID'),
+            'S_ID' => Yii::t('app', 'ID'),
+            'S_name' => Yii::t('app', 'Subject'),
+            'S_T_ID' => Yii::t('app', 'Teacher'),
         ];
     }
 
@@ -65,11 +65,11 @@ class Subjects extends \yii\db\ActiveRecord
     /**
      * Gets query for [[ST]].
      *
-     * @return \yii\db\ActiveQuery|TeacherQuery
+     * @return \yii\db\ActiveQuery|TeachersQuery
      */
     public function getST()
     {
-        return $this->hasOne(Teacher::class, ['T_ID' => 'S_T_ID']);
+        return $this->getTeacher();
     }
 
     /**
@@ -81,7 +81,6 @@ class Subjects extends \yii\db\ActiveRecord
         return new SubjectsQuery(get_called_class());
     }
 
-    // Subjects.php
     public function getTeacher()
     {
         return $this->hasOne(Teachers::class, ['T_ID' => 'S_T_ID']);

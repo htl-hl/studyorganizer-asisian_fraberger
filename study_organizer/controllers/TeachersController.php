@@ -3,8 +3,10 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Subjects;
 use app\models\Teachers;
 use app\models\TeachersSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,8 +24,21 @@ class TeachersController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'roles' => ['@'],
+                            'matchCallback' => static function () {
+                                return !Yii::$app->user->isGuest
+                                    && Yii::$app->user->identity->isAdmin();
+                            },
+                        ],
+                    ],
+                ],
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -41,12 +56,13 @@ class TeachersController extends Controller
     {
         $searchModel = new TeachersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $teachers = Teachers::find()->all(); // alle Lehrer holen
+        $dataProvider->query
+            ->with('subjects')
+            ->orderBy(['T_name' => SORT_ASC]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'teachers' => $teachers // alle Lehrer'
         ]);
     }
 
@@ -71,12 +87,44 @@ class TeachersController extends Controller
     public function actionCreate()
     {
         $model = new Teachers();
+        $model->scenario = 'create';
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $transaction = Yii::$app->db->beginTransaction();
+
+            try {
+                $subject = new Subjects([
+                    'S_name' => $model->initialSubjectName,
+                ]);
+
+                if (!$model->save(false)) {
+                    throw new \RuntimeException('Teacher could not be saved.');
+                }
+
+                $subject->S_T_ID = $model->T_ID;
+
+                if (!$subject->save()) {
+                    foreach ($subject->getFirstErrors() as $message) {
+                        $model->addError('initialSubjectName', $message);
+                    }
+
+                    throw new \RuntimeException('Subject could not be saved.');
+                }
+
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', 'Teacher created successfully with the first subject.');
+
                 return $this->redirect(['view', 'T_ID' => $model->T_ID]);
+            } catch (\Throwable $exception) {
+                $transaction->rollBack();
+
+                if (!$model->hasErrors('initialSubjectName')) {
+                    $model->addError('initialSubjectName', 'The first subject could not be created.');
+                }
             }
-        } else {
+        }
+
+        if ($this->request->isGet) {
             $model->loadDefaultValues();
         }
 
@@ -97,6 +145,8 @@ class TeachersController extends Controller
         $model = $this->findModel($T_ID);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Teacher updated successfully.');
+
             return $this->redirect(['view', 'T_ID' => $model->T_ID]);
         }
 
@@ -114,17 +164,9 @@ class TeachersController extends Controller
      */
     public function actionDelete($T_ID)
     {
-        // Prüfen, ob der Lehrer noch Fächer hat
-        if (\app\models\Subjects::find()->where(['S_T_ID' => $T_ID])->exists()) {
-            Yii::$app->session->setFlash('error', 'Dieser Lehrer hat noch Fächer. Lösche zuerst die Fächer.');
-            return $this->redirect(['index']);
-        }
+        Yii::$app->session->setFlash('error', 'Teachers cannot be deleted. Set the teacher to inactive instead.');
 
-        // Lehrer löschen
-        $this->findModel($T_ID)->delete();
-
-        Yii::$app->session->setFlash('success', 'Lehrer erfolgreich gelöscht.');
-        return $this->redirect(['index']);
+        return $this->redirect(['view', 'T_ID' => $T_ID]);
     }
 
     /**

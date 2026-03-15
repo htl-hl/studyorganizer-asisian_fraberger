@@ -10,37 +10,35 @@ use yii\bootstrap5\Html;
 $this->title = 'Register';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-register">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="content-box">
+            <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Create a basic account:</p>
-
-    <div class="row">
-        <div class="col-lg-5">
             <?php $form = ActiveForm::begin([
                 'id' => 'register-form',
-                'fieldConfig' => [
-                    'template' => "{label}\n{input}\n{error}",
-                    'labelOptions' => ['class' => 'col-lg-1 col-form-label mr-lg-3'],
-                    'inputOptions' => ['class' => 'col-lg-3 form-control'],
-                    'errorOptions' => ['class' => 'col-lg-7 invalid-feedback'],
-                ],
+                'enableClientValidation' => true,
             ]); ?>
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-            <?= $form->field($model, 'password')->passwordInput() ?>
+            <?= $form->field($model, 'username')->textInput([
+                'autofocus' => true,
+                'maxlength' => true,
+                'autocomplete' => 'username',
+            ]) ?>
+            <?= $form->field($model, 'password')->passwordInput([
+                'autocomplete' => 'new-password',
+            ])->hint('Use at least 6 characters.') ?>
 
             <div class="form-group">
-                <div>
-                    <?= Html::submitButton('Register', ['class' => 'btn btn-primary', 'name' => 'register-button']) ?>
-                </div>
+                <?= Html::submitButton('Create account', ['class' => 'btn btn-primary', 'name' => 'register-button']) ?>
             </div>
 
             <?php ActiveForm::end(); ?>
 
-            <div class="mt-3">
-                Already have an account? <?= Html::a('Login here', ['site/login']) ?>.
-            </div>
+            <p class="mb-0">
+                Already have an account?
+                <?= Html::a('Login here', ['/site/login']) ?>.
+            </p>
         </div>
     </div>
 </div>

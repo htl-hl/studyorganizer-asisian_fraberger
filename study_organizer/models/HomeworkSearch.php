@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Homework;
@@ -43,7 +44,11 @@ class HomeworkSearch extends Homework
     {
         $query = Homework::find();
 
-        // add conditions that should always apply here
+        if (!Yii::$app->user->isGuest) {
+            $query->andWhere(['H_U_ID' => Yii::$app->user->id]);
+        } else {
+            $query->where('0=1');
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

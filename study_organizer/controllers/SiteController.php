@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Homework;
+use app\models\SignupForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -21,8 +22,13 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['login', 'logout', 'register'],
                 'rules' => [
+                    [
+                        'actions' => ['login', 'register'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
                     [
                         'actions' => ['logout'],
                         'allow' => true,
@@ -62,10 +68,19 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        // Alle Homework aus der Datenbank holen
-        $homeworks = Homework::find()->all();
+        $homeworks = [];
 
-        // an View übergeben
+        if (!Yii::$app->user->isGuest) {
+            $homeworks = Homework::find()
+                ->with('subject')
+                ->where(['H_U_ID' => Yii::$app->user->id])
+                ->orderBy([
+                    'H_is_done' => SORT_ASC,
+                    'H_due_date' => SORT_ASC,
+                ])
+                ->all();
+        }
+
         return $this->render('index', [
             'homeworks' => $homeworks,
         ]);
@@ -89,6 +104,31 @@ class SiteController extends Controller
 
         $model->password = '';
         return $this->render('login', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Registers a new user account.
+     *
+     * @return Response|string
+     */
+    public function actionRegister()
+    {
+        $model = new SignupForm();
+
+        if ($model->load(Yii::$app->request->post())) {
+            $user = $model->signup();
+
+            if ($user !== null) {
+                Yii::$app->user->login($user);
+                Yii::$app->session->setFlash('success', 'Welcome! Your account has been created.');
+
+                return $this->goHome();
+            }
+        }
+
+        return $this->render('register', [
             'model' => $model,
         ]);
     }

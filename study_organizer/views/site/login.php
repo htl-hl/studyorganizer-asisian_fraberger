@@ -1,111 +1,45 @@
 <?php
-/** @var yii\web\View $this */
-/** @var app\models\Homework[] $homeworks */
 
-$this->title = 'Dashboard';
+/** @var yii\web\View $this */
+/** @var app\models\LoginForm $model */
+
+use yii\bootstrap5\ActiveForm;
+use yii\bootstrap5\Html;
+
+$this->title = 'Login';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="container mt-4">
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="content-box">
+            <h1><?= Html::encode($this->title) ?></h1>
 
-    <!-- Titel -->
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-5">📊 StudyOrganizer Dashboard</h1>
-            <p class="text-muted">Übersicht deiner Hausübungen</p>
-        </div>
-    </div>
+            <?php $form = ActiveForm::begin([
+                'id' => 'login-form',
+                'enableClientValidation' => true,
+            ]); ?>
 
-    <!-- Karten Übersicht -->
-    <div class="row mb-4">
+            <?= $form->field($model, 'username')->textInput([
+                'autofocus' => true,
+                'maxlength' => true,
+                'autocomplete' => 'username',
+            ]) ?>
 
-        <!-- Homework Card -->
-        <div class="col-md-4">
-            <div class="card text-white bg-primary shadow">
-                <div class="card-body">
-                    <h5 class="card-title">📚 Homework</h5>
-                    <p class="card-text fs-4">
-                        <?= count($homeworks) ?> Einträge
-                    </p>
-                    <a href="index.php?r=homework/index" class="btn btn-light btn-sm">
-                        Anzeigen
-                    </a>
-                </div>
+            <?= $form->field($model, 'password')->passwordInput([
+                'autocomplete' => 'current-password',
+            ]) ?>
+
+            <div class="form-group">
+                <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
             </div>
-        </div>
 
-        <!-- Neue Homework -->
-        <div class="col-md-4">
-            <div class="card text-white bg-success shadow">
-                <div class="card-body">
-                    <h5 class="card-title">➕ Neue Homework</h5>
-                    <p class="card-text">
-                        Neue Hausübung hinzufügen
-                    </p>
-                    <a href="index.php?r=homework/create" class="btn btn-light btn-sm">
-                        Erstellen
-                    </a>
-                </div>
-            </div>
-        </div>
+            <?php ActiveForm::end(); ?>
 
-    </div>
-
-    <!-- Tabelle -->
-    <div class="card shadow">
-        <div class="card-header bg-dark text-white">
-            📋 Letzte Homework
-        </div>
-
-        <div class="card-body">
-
-            <table class="table table-hover">
-
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titel</th>
-                    <th>Aktionen</th>
-                </tr>
-                </thead>
-
-                <tbody>
-
-                <?php foreach ($homeworks as $hw): ?>
-                    <tr>
-                        <td><?= $hw->id ?></td>
-
-                        <td>
-                            <strong><?= $hw->title ?></strong>
-                        </td>
-
-                        <td>
-
-                            <a href="index.php?r=homework/view&id=<?= $hw->id ?>"
-                               class="btn btn-sm btn-primary">
-                                👁 View
-                            </a>
-
-                            <a href="index.php?r=homework/update&id=<?= $hw->id ?>"
-                               class="btn btn-sm btn-warning">
-                                ✏ Edit
-                            </a>
-
-                            <a href="index.php?r=homework/delete&id=<?= $hw->id ?>"
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('Wirklich löschen?')">
-                                🗑 Delete
-                            </a>
-
-                        </td>
-
-                    </tr>
-                <?php endforeach; ?>
-
-                </tbody>
-
-            </table>
-
+            <p class="mb-0">
+                Need an account?
+                <?= Html::a('Register here', ['/site/register']) ?>.
+            </p>
         </div>
     </div>
-
 </div>

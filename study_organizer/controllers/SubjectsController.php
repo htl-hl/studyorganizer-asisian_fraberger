@@ -2,10 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\Homework;
 use Yii;
 use app\models\Subjects;
 use app\models\SubjectsSearch;
-use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -23,8 +24,21 @@ class SubjectsController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'roles' => ['@'],
+                            'matchCallback' => static function () {
+                                return !Yii::$app->user->isGuest
+                                    && Yii::$app->user->identity->isAdmin();
+                            },
+                        ],
+                    ],
+                ],
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -42,12 +56,13 @@ class SubjectsController extends Controller
     {
         $searchModel = new SubjectsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $subjects = Subjects::find()->with('teacher')->all(); // alle Fächer + Lehrer
+        $dataProvider->query
+            ->with('teacher')
+            ->orderBy(['S_name' => SORT_ASC]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'subjects' => $subjects // alle Fächer + Lehrer'
         ]);
     }
 
@@ -74,7 +89,9 @@ class SubjectsController extends Controller
         $model = new Subjects();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            Yii::$app->session->setFlash('success', 'Subject created successfully.');
+
+            return $this->redirect(['view', 'S_ID' => $model->S_ID]);
         }
 
         return $this->render('create', [
@@ -94,6 +111,8 @@ class SubjectsController extends Controller
         $model = $this->findModel($S_ID);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Subject updated successfully.');
+
             return $this->redirect(['view', 'S_ID' => $model->S_ID]);
         }
 
@@ -111,7 +130,14 @@ class SubjectsController extends Controller
      */
     public function actionDelete($S_ID)
     {
+        if (Homework::find()->where(['H_S_ID' => $S_ID])->exists()) {
+            Yii::$app->session->setFlash('error', 'This subject still has homework assigned to it.');
+
+            return $this->redirect(['index']);
+        }
+
         $this->findModel($S_ID)->delete();
+        Yii::$app->session->setFlash('success', 'Subject deleted successfully.');
 
         return $this->redirect(['index']);
     }

@@ -12,7 +12,10 @@ use yii\web\IdentityInterface;
  * @property int $U_ID
  * @property string $U_username
  * @property string $U_password
+ * @property string|null $U_auth_key
  * @property string $U_role
+ *
+ * @property Homework[] $homeworks
  */
 class Users extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -32,9 +35,13 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['U_username'], 'trim'],
+            [['U_role'], 'default', 'value' => 'user'],
+            [['U_auth_key'], 'default', 'value' => null],
             [['U_username', 'U_password', 'U_role'], 'required'],
-            [['U_username', 'U_password', 'U_role'], 'string', 'max' => 255],
+            [['U_username', 'U_password', 'U_auth_key', 'U_role'], 'string', 'max' => 255],
             [['U_username'], 'unique'],
+            [['U_role'], 'in', 'range' => ['admin', 'user']],
         ];
     }
 
@@ -44,10 +51,11 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'U_ID' => Yii::t('app', 'U ID'),
-            'U_username' => Yii::t('app', 'U Username'),
-            'U_password' => Yii::t('app', 'U Password'),
-            'U_role' => Yii::t('app', 'U Role'),
+            'U_ID' => Yii::t('app', 'ID'),
+            'U_username' => Yii::t('app', 'Username'),
+            'U_password' => Yii::t('app', 'Password'),
+            'U_auth_key' => Yii::t('app', 'Auth key'),
+            'U_role' => Yii::t('app', 'Role'),
         ];
     }
 
@@ -66,6 +74,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
             $this->U_password = $this->getOldAttribute('U_password');
         }
 
+        if (!$this->isNewRecord && ($this->U_auth_key === '' || $this->U_auth_key === null)) {
+            $this->U_auth_key = $this->getOldAttribute('U_auth_key');
+        }
+
         return parent::beforeValidate();
     }
 
@@ -77,6 +89,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
 
         if ($this->U_password !== null && $this->U_password !== '' && !$this->isPasswordHash($this->U_password)) {
             $this->U_password = Yii::$app->security->generatePasswordHash($this->U_password);
+        }
+
+        if ($this->U_auth_key === null || $this->U_auth_key === '') {
+            $this->U_auth_key = Yii::$app->security->generateRandomString();
         }
 
         return true;
@@ -109,12 +125,12 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function getAuthKey()
     {
-        return null;
+        return $this->U_auth_key;
     }
 
     public function validateAuthKey($authKey)
     {
-        return false;
+        return $this->U_auth_key !== null && hash_equals($this->U_auth_key, (string) $authKey);
     }
 
     public function validatePassword($password)
@@ -133,6 +149,16 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     private function isPasswordHash($value)
     {
         return preg_match('/^\\$(2y|2a|argon2i|argon2id)\\$/', $value) === 1;
+    }
+
+    public function getHomeworks()
+    {
+        return $this->hasMany(Homework::class, ['H_U_ID' => 'U_ID']);
+    }
+
+    public function isAdmin()
+    {
+        return $this->U_role === 'admin';
     }
 
 }

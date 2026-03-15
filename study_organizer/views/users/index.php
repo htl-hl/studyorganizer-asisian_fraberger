@@ -30,10 +30,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'U_ID',
             'U_username',
-            'U_password',
-            'U_role',
+            [
+                'attribute' => 'U_role',
+                'label' => 'Role',
+                'format' => 'raw',
+                'filter' => ['user' => 'User', 'admin' => 'Admin'],
+                'value' => static function (Users $model) {
+                    $class = $model->U_role === 'admin' ? 'text-bg-dark' : 'text-bg-secondary';
+
+                    return '<span class="badge ' . $class . '">' . Html::encode(ucfirst($model->U_role)) . '</span>';
+                },
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Users $model, $key, $index, $column) {

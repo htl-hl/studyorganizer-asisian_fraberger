@@ -10,11 +10,13 @@ use Yii;
  * @property int $T_ID
  * @property string $T_name
  * @property int $T_is_active
+ * @property string|null $initialSubjectName
  *
  * @property Subject[] $subjects
  */
 class Teachers extends \yii\db\ActiveRecord
 {
+    public $initialSubjectName;
 
 
     /**
@@ -33,8 +35,10 @@ class Teachers extends \yii\db\ActiveRecord
         return [
             [['T_is_active'], 'default', 'value' => 1],
             [['T_name'], 'required'],
+            [['initialSubjectName'], 'required', 'on' => 'create'],
             [['T_is_active'], 'integer'],
-            [['T_name'], 'string', 'max' => 255],
+            [['T_name', 'initialSubjectName'], 'string', 'max' => 255],
+            [['initialSubjectName'], 'unique', 'targetClass' => Subjects::class, 'targetAttribute' => 'S_name', 'on' => 'create'],
         ];
     }
 
@@ -44,20 +48,21 @@ class Teachers extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'T_ID' => Yii::t('app', 'T ID'),
-            'T_name' => Yii::t('app', 'T Name'),
-            'T_is_active' => Yii::t('app', 'T Is Active'),
+            'T_ID' => Yii::t('app', 'ID'),
+            'T_name' => Yii::t('app', 'Name'),
+            'T_is_active' => Yii::t('app', 'Active'),
+            'initialSubjectName' => Yii::t('app', 'First subject'),
         ];
     }
 
     /**
      * Gets query for [[Subjects]].
      *
-     * @return \yii\db\ActiveQuery|SubjectQuery
+     * @return \yii\db\ActiveQuery|SubjectsQuery
      */
     public function getSubjects()
     {
-        return $this->hasMany(Subject::class, ['S_T_ID' => 'T_ID']);
+        return $this->hasMany(Subjects::class, ['S_T_ID' => 'T_ID']);
     }
 
     /**
