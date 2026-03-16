@@ -9,7 +9,6 @@ use yii\widgets\ActiveForm;
 ?>
 
 <div class="users-form">
-
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'U_username')->textInput(['maxlength' => true]) ?>
@@ -24,9 +23,8 @@ use yii\widgets\ActiveForm;
     ]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>

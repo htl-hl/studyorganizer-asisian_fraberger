@@ -25,10 +25,10 @@ $teacherFilter = ArrayHelper::map(
 ?>
 <div class="subjects-index">
     <div class="content-box">
-        <h1><?= Html::encode($this->title) ?></h1>
-        <p class="mb-0">
+        <div class="section-header">
+            <h1 class="mb-0"><?= Html::encode($this->title) ?></h1>
             <?= Html::a(Yii::t('app', 'Create subject'), ['create'], ['class' => 'btn btn-primary']) ?>
-        </p>
+        </div>
     </div>
 
     <div class="content-box">

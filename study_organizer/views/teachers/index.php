@@ -16,10 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="teachers-index">
     <div class="content-box">
-        <h1><?= Html::encode($this->title) ?></h1>
-        <p class="mb-0">
+        <div class="section-header">
+            <h1 class="mb-0"><?= Html::encode($this->title) ?></h1>
             <?= Html::a(Yii::t('app', 'Create teacher'), ['create'], ['class' => 'btn btn-primary']) ?>
-        </p>
+        </div>
     </div>
 
     <div class="content-box">

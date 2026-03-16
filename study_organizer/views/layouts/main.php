@@ -66,27 +66,29 @@ if ($isGuest) {
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <title><?= Html::encode($this->title) ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <?php $this->head() ?>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 app-body">
 <?php $this->beginBody() ?>
 
 <header>
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->name,
+        'brandLabel' => '<i class="bi bi-book-half me-2"></i>' . Html::encode(Yii::$app->name),
         'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar navbar-expand-lg navbar-light bg-white border-bottom'],
+        'options' => ['class' => 'navbar navbar-expand-lg navbar-light app-navbar'],
     ]);
     echo Nav::widget([
-        'options' => ['class' => 'navbar-nav ms-auto align-items-lg-center'],
+        'encodeLabels' => false,
+        'options' => ['class' => 'navbar-nav ms-auto align-items-lg-center gap-lg-1'],
         'items' => $navItems,
     ]);
     NavBar::end();
     ?>
 </header>
 
-<main class="flex-shrink-0">
+<main class="flex-shrink-0 app-main">
     <div class="container">
         <?php if (!empty($this->params['breadcrumbs'])): ?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
@@ -96,10 +98,10 @@ if ($isGuest) {
     </div>
 </main>
 
-<footer class="mt-auto border-top bg-white py-3">
+<footer class="mt-auto app-footer py-3">
     <div class="container d-flex flex-column flex-md-row justify-content-between small gap-2">
-        <span>&copy; StudyOrganizer <?= date('Y') ?></span>
-        <span>Simple Yii2 school project</span>
+        <span>StudyOrganizer <?= date('Y') ?></span>
+        <span>Built with Yii2</span>
     </div>
 </footer>
 
